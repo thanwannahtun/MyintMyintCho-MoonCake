@@ -1,219 +1,1060 @@
-import { Button } from "@/components/ui/button";
-import { motion } from "framer-motion";
-import PackagingShowcase from "@/components/PackagingShowcase";
-import MarketTrendsChart from "@/components/MarketTrendsChart";
-import FlavorProfileRadar from "@/components/FlavorProfileRadar";
-import { Download, Share2, ArrowRight, Coffee, MapPin } from "lucide-react";
+import { useState, useEffect, useRef, ReactNode, RefObject } from "react";
+import { motion, AnimatePresence, Variants } from "framer-motion";
+import { ShoppingCart, X, Plus, Minus, Menu, MapPin, Clock, Phone, ArrowRight, ChevronDown } from "lucide-react";
 
-export default function Home() {
-  const fadeIn = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
-  };
+// ─── Types ─────────────────────────────────────────────────────────────────
 
-  const staggerContainer = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2
-      }
-    }
-  };
+type ProductCategory = "mooncake" | "htoomount" | "gift";
+type FilterCategory = "all" | ProductCategory;
 
-  return (
-    <div className="min-h-screen bg-background text-foreground overflow-x-hidden font-sans selection:bg-primary/20">
-      {/* Hero Section */}
-      <section className="relative min-h-screen flex flex-col justify-center items-center px-4 py-20 overflow-hidden">
-        {/* Abstract Background Elements */}
-        <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
-          <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] rounded-full bg-secondary/20 blur-[100px]" />
-          <div className="absolute bottom-[-10%] left-[-5%] w-[400px] h-[400px] rounded-full bg-primary/10 blur-[80px]" />
-          <div className="absolute top-[20%] left-[10%] w-24 h-24 opacity-10 rotate-12">
-            <Coffee className="w-full h-full text-primary" />
-          </div>
-        </div>
+interface Product {
+    id: number;
+    category: ProductCategory;
+    badge: string;
+    name: string;
+    burmese: string;
+    price: number;
+    unit: string;
+    desc: string;
+    flavors: string[];
+    img: string;
+    color: string;
+    bg: string;
+}
 
-        <motion.div 
-          initial="hidden"
-          animate="visible"
-          variants={staggerContainer}
-          className="container relative z-10 text-center max-w-4xl mx-auto"
+interface CartItem extends Product {
+    qty: number;
+}
+
+interface StoreLocation {
+    type: string;
+    name: string;
+    addr: string;
+    hours: string;
+    phone: string;
+    highlight: boolean;
+}
+
+interface FooterColumn {
+    title: string;
+    links: string[];
+}
+
+interface AnimSectionProps {
+    children: ReactNode;
+    className?: string;
+    delay?: number;
+}
+
+interface CartDrawerProps {
+    cart: CartItem[];
+    open: boolean;
+    onClose: () => void;
+    onRemove: (id: number) => void;
+    onQty: (id: number, delta: number) => void;
+}
+
+interface ProductCardProps {
+    p: Product;
+    onAdd: (p: Product) => void;
+    onView: (p: Product) => void;
+}
+
+interface ProductModalProps {
+    p: Product | null;
+    onClose: () => void;
+    onAdd: (p: Product) => void;
+}
+
+// ─── Data ──────────────────────────────────────────────────────────────────
+
+const PRODUCTS: Product[] = [
+    {
+        id: 1, category: "mooncake", badge: "Signature",
+        name: "Coffee Mooncake", burmese: "ကော်ဖီလမုန့်",
+        price: 4500, unit: "box / 4 pcs",
+        desc: "Rich Mandalay coffee blended into silky lotus paste, wrapped in our golden-brown flaky crust. The iconic MMC creation.",
+        flavors: ["Espresso", "White Coffee", "Robusta Blend"],
+        img: "☕", color: "#6F4E37", bg: "#FFF8F2",
+    },
+    {
+        id: 2, category: "mooncake", badge: "Classic",
+        name: "Lotus Seed Mooncake", burmese: "ကြာစေ့လမုန့်",
+        price: 3800, unit: "box / 4 pcs",
+        desc: "Traditional double-yolk lotus seed paste mooncake. Time-honoured recipe passed through three generations.",
+        flavors: ["Single Yolk", "Double Yolk", "No Yolk"],
+        img: "🌸", color: "#C9A96E", bg: "#FFFBF2",
+    },
+    {
+        id: 3, category: "mooncake", badge: "New",
+        name: "Pandan Coconut Mooncake", burmese: "ပန်းသေနတ်လမုန့်",
+        price: 4200, unit: "box / 4 pcs",
+        desc: "Fragrant pandan leaf extract meets rich Ayeyarwady coconut cream — a tropical Burmese celebration in every bite.",
+        flavors: ["Classic", "Toasted Coconut"],
+        img: "🥥", color: "#2D6A4F", bg: "#F0FFF4",
+    },
+    {
+        id: 4, category: "htoomount", badge: "Bestseller",
+        name: "Golden Htoomount", burmese: "ရွှေထူးမောင့်",
+        price: 1800, unit: "per 500g",
+        desc: "Mandalay's pride — steamed glutinous rice with palm sugar and sesame. Soft, chewy, and deeply aromatic.",
+        flavors: ["Original", "Black Sesame", "Coconut"],
+        img: "🟡", color: "#D4A017", bg: "#FFFDF0",
+    },
+    {
+        id: 5, category: "htoomount", badge: "Seasonal",
+        name: "Jackfruit Htoomount", burmese: "ဖရဲသီးထူးမောင့်",
+        price: 2200, unit: "per 500g",
+        desc: "Fresh ripe jackfruit folded into our signature glutinous base. A seasonal delight celebrating Mandalay summers.",
+        flavors: ["Sweet", "Extra Sweet"],
+        img: "🍈", color: "#E8A000", bg: "#FFFAEB",
+    },
+    {
+        id: 6, category: "gift", badge: "Gift Set",
+        name: "Heritage Gift Box", burmese: "မြန်မာ့အမွေအနှစ် လက်ဆောင်ပုံး",
+        price: 18500, unit: "set",
+        desc: "A curated luxury box featuring 2 mooncakes + 2 htoomount varieties, gift-wrapped with traditional Mandalay fabric ribbon.",
+        flavors: ["Assorted"],
+        img: "🎁", color: "#8B1A1A", bg: "#FFF5F5",
+    },
+];
+
+const STORE_LOCATIONS: StoreLocation[] = [
+    {
+        type: "🏭 Main Factory",
+        name: "MMC Production Factory",
+        addr: "No. 45, Sein Pan Road, Chan Aye Thar Zan Township, Mandalay",
+        hours: "Mon–Sat: 7:00 AM – 5:00 PM",
+        phone: "+95 2 123 4567",
+        highlight: true,
+    },
+    {
+        type: "🏪 Showroom",
+        name: "MMC Mandalay Central",
+        addr: "No. 12, 83rd Street, Aung Myay Thar Zan Township, Mandalay",
+        hours: "Daily: 8:00 AM – 8:00 PM",
+        phone: "+95 9 876 5432",
+        highlight: false,
+    },
+    {
+        type: "📦 Online Store",
+        name: "MMC Online Shop",
+        addr: "Delivers across all Myanmar. Free delivery in Mandalay for orders over 10,000 Ks.",
+        hours: "Orders: 24/7 · Dispatch: Mon–Sat",
+        phone: "+95 9 111 2233",
+        highlight: false,
+    },
+];
+
+const FOOTER_COLUMNS: FooterColumn[] = [
+    { title: "Shop", links: ["Mooncakes", "Htoomount", "Gift Sets", "New Arrivals", "Seasonal Specials"] },
+    { title: "Company", links: ["About MMC", "Our Heritage", "Factory Tour", "Wholesale", "Careers"] },
+    { title: "Support", links: ["Contact Us", "Delivery Info", "Returns Policy", "FAQ", "Track Order"] },
+];
+
+const BADGE_COLORS: Record<string, string> = {
+    New: "#2D6A4F",
+    Bestseller: "#C4501A",
+    Seasonal: "#D4A017",
+    default: "#8B1A1A",
+};
+
+// ─── Framer Motion Variants ─────────────────────────────────────────────────
+
+const fadeUp: Variants = {
+    hidden: { opacity: 0, y: 30 },
+    visible: { opacity: 1, y: 0 },
+};
+
+const stagger: Variants = {
+    hidden: {},
+    visible: { transition: { staggerChildren: 0.12 } },
+};
+
+// ─── Hooks ─────────────────────────────────────────────────────────────────
+
+function useScrollY(): number {
+    const [y, setY] = useState<number>(0);
+    useEffect(() => {
+        const fn = () => setY(window.scrollY);
+        window.addEventListener("scroll", fn, { passive: true });
+        return () => window.removeEventListener("scroll", fn);
+    }, []);
+    return y;
+}
+
+function useInView(ref: RefObject<HTMLDivElement | null>, threshold = 0.15): boolean {
+    const [visible, setVisible] = useState<boolean>(false);
+    useEffect(() => {
+        const obs = new IntersectionObserver(
+            ([entry]) => { if (entry.isIntersecting) setVisible(true); },
+            { threshold }
+        );
+        if (ref.current) obs.observe(ref.current);
+        return () => obs.disconnect();
+    }, [ref, threshold]);
+    return visible;
+}
+
+// ─── Utility Components ────────────────────────────────────────────────────
+
+function AnimSection({ children, className = "", delay = 0 }: AnimSectionProps) {
+    const ref = useRef<HTMLDivElement>(null);
+    const visible = useInView(ref);
+    return (
+        <div
+            ref={ref}
+            className={className}
+            style={{
+                opacity: visible ? 1 : 0,
+                transform: visible ? "translateY(0)" : "translateY(40px)",
+                transition: `opacity 0.75s ease ${delay}s, transform 0.75s ease ${delay}s`,
+            }}
         >
-          <motion.div variants={fadeIn} className="mb-6 inline-block">
-            <span className="px-4 py-1.5 rounded-full border border-secondary text-secondary-foreground text-sm font-medium tracking-wider uppercase bg-secondary/10 backdrop-blur-sm">
-              New Product Launch
-            </span>
-          </motion.div>
-          
-          <motion.h1 variants={fadeIn} className="text-5xl md:text-7xl font-bold mb-6 tracking-tight text-primary leading-tight">
-            Myint Myint Cho <br/>
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-accent to-primary bg-300% animate-gradient">
-              Coffee Mooncake
-            </span>
-          </motion.h1>
-          
-          <motion.p variants={fadeIn} className="text-xl md:text-2xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed">
-            A fusion of Mandalay's rich heritage and modern coffee culture. 
-            Experience the traditional Burmese "လမုန့်" reimagined.
-          </motion.p>
-          
-          <motion.div variants={fadeIn} className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button size="lg" className="rounded-full px-8 py-6 text-lg shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all duration-300">
-              Explore Design <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
-            <Button variant="outline" size="lg" className="rounded-full px-8 py-6 text-lg border-primary/20 hover:bg-primary/5">
-              View Specs
-            </Button>
-          </motion.div>
-        </motion.div>
+            {children}
+        </div>
+    );
+}
 
-        {/* Scroll Indicator */}
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.5, duration: 1 }}
-          className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce"
+function BadgeLabel({ badge }: { badge: string }) {
+    const bg = BADGE_COLORS[badge] ?? BADGE_COLORS.default;
+    return (
+        <div style={{
+            position: "absolute", top: 14, left: 14, zIndex: 2,
+            background: bg, color: "#fff", fontSize: 11, fontWeight: 700,
+            padding: "4px 10px", borderRadius: 20, letterSpacing: "0.5px",
+        }}>
+            {badge}
+        </div>
+    );
+}
+
+// ─── Cart Drawer ───────────────────────────────────────────────────────────
+
+function CartDrawer({ cart, open, onClose, onRemove, onQty }: CartDrawerProps) {
+    const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
+
+    return (
+        <>
+            <AnimatePresence>
+                {open && (
+                    <motion.div
+                        key="overlay"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.25 }}
+                        onClick={onClose}
+                        style={{
+                            position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)",
+                            zIndex: 200,
+                        }}
+                    />
+                )}
+            </AnimatePresence>
+
+            <motion.div
+                initial={{ x: "100%" }}
+                animate={{ x: open ? "0%" : "100%" }}
+                transition={{ type: "spring", stiffness: 300, damping: 35 }}
+                style={{
+                    position: "fixed", top: 0, right: 0, bottom: 0,
+                    width: "min(420px, 100vw)", background: "#fff", zIndex: 201,
+                    boxShadow: "-4px 0 40px rgba(0,0,0,0.15)",
+                    display: "flex", flexDirection: "column",
+                }}
+            >
+                {/* Header */}
+                <div style={{ padding: "24px", borderBottom: "1px solid #f0e6d3", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div>
+                        <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 22, fontWeight: 700, color: "#3D1C02" }}>Your Cart 🛒</div>
+                        <div style={{ fontSize: 13, color: "#a08060" }}>{cart.length} item{cart.length !== 1 ? "s" : ""}</div>
+                    </div>
+                    <button onClick={onClose} style={{ border: "none", background: "none", fontSize: 24, cursor: "pointer", color: "#888", display: "flex", alignItems: "center" }}>
+                        <X size={22} />
+                    </button>
+                </div>
+
+                {/* Items */}
+                <div style={{ flex: 1, overflowY: "auto", padding: "16px 24px" }}>
+                    {cart.length === 0 ? (
+                        <div style={{ textAlign: "center", padding: "60px 0", color: "#c0a080" }}>
+                            <div style={{ fontSize: 48 }}>🎑</div>
+                            <div style={{ marginTop: 12, fontSize: 15 }}>Your cart is empty</div>
+                        </div>
+                    ) : (
+                        <AnimatePresence>
+                            {cart.map((item) => (
+                                <motion.div
+                                    key={item.id}
+                                    layout
+                                    initial={{ opacity: 0, x: 20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: -20 }}
+                                    style={{ display: "flex", gap: 14, padding: "16px 0", borderBottom: "1px solid #f5ede0", alignItems: "center" }}
+                                >
+                                    <div style={{ fontSize: 36, width: 56, height: 56, borderRadius: 12, background: item.bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                        {item.img}
+                                    </div>
+                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                        <div style={{ fontWeight: 600, fontSize: 14, color: "#3D1C02" }}>{item.name}</div>
+                                        <div style={{ fontSize: 12, color: "#a08060" }}>{item.unit}</div>
+                                        <div style={{ fontWeight: 700, color: "#C4501A", fontSize: 15, marginTop: 4 }}>
+                                            {item.price.toLocaleString()} Ks
+                                        </div>
+                                    </div>
+                                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, flexShrink: 0 }}>
+                                        <div style={{ display: "flex", alignItems: "center", gap: 8, background: "#fdf5ea", borderRadius: 20, padding: "4px 8px" }}>
+                                            <button onClick={() => onQty(item.id, -1)} style={{ border: "none", background: "none", cursor: "pointer", fontWeight: 700, fontSize: 16, color: "#C4501A", display: "flex", alignItems: "center" }}>
+                                                <Minus size={14} />
+                                            </button>
+                                            <span style={{ fontWeight: 700, minWidth: 20, textAlign: "center" }}>{item.qty}</span>
+                                            <button onClick={() => onQty(item.id, 1)} style={{ border: "none", background: "none", cursor: "pointer", fontWeight: 700, fontSize: 16, color: "#C4501A", display: "flex", alignItems: "center" }}>
+                                                <Plus size={14} />
+                                            </button>
+                                        </div>
+                                        <button onClick={() => onRemove(item.id)} style={{ fontSize: 11, color: "#ccc", border: "none", background: "none", cursor: "pointer" }}>
+                                            Remove
+                                        </button>
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </AnimatePresence>
+                    )}
+                </div>
+
+                {/* Checkout */}
+                {cart.length > 0 && (
+                    <div style={{ padding: "20px 24px", borderTop: "1px solid #f0e6d3" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16 }}>
+                            <span style={{ color: "#888", fontSize: 15 }}>Total</span>
+                            <span style={{ fontWeight: 800, fontSize: 20, color: "#3D1C02" }}>{total.toLocaleString()} Ks</span>
+                        </div>
+                        <button style={{
+                            width: "100%", padding: "16px", borderRadius: 14, border: "none",
+                            background: "linear-gradient(135deg, #C4501A, #8B1A1A)", color: "#fff",
+                            fontWeight: 700, fontSize: 16, cursor: "pointer", letterSpacing: "0.5px", fontFamily: "inherit",
+                        }}>
+                            Checkout →
+                        </button>
+                        <div style={{ textAlign: "center", marginTop: 10, fontSize: 12, color: "#c0a080" }}>
+                            Free delivery in Mandalay · Orders over 10,000 Ks
+                        </div>
+                    </div>
+                )}
+            </motion.div>
+        </>
+    );
+}
+
+// ─── Product Card ──────────────────────────────────────────────────────────
+
+function ProductCard({ p, onAdd, onView }: ProductCardProps) {
+    return (
+        <motion.div
+            whileHover={{ y: -8, boxShadow: "0 20px 60px rgba(196,80,26,0.18)" }}
+            transition={{ duration: 0.3 }}
+            style={{
+                borderRadius: 20, overflow: "hidden", background: "#fff",
+                boxShadow: "0 4px 24px rgba(0,0,0,0.06)",
+                border: "1px solid #f5ede0", position: "relative",
+            }}
         >
-          <div className="w-6 h-10 border-2 border-primary/30 rounded-full flex justify-center pt-2">
-            <div className="w-1.5 h-1.5 bg-primary rounded-full" />
-          </div>
+            <BadgeLabel badge={p.badge} />
+
+            {/* Image area */}
+            <motion.div
+                whileHover={{ scale: 1.08 }}
+                transition={{ duration: 0.3 }}
+                style={{
+                    height: 180, background: `linear-gradient(135deg, ${p.bg}, #fff)`,
+                    display: "flex", alignItems: "center", justifyContent: "center", fontSize: 72,
+                }}
+            >
+                {p.img}
+            </motion.div>
+
+            <div style={{ padding: "20px 22px 22px" }}>
+                <div style={{ fontSize: 11, color: "#a08060", fontWeight: 600, textTransform: "uppercase", letterSpacing: "1px", marginBottom: 4 }}>
+                    {p.category === "mooncake" ? "Mooncake" : p.category === "htoomount" ? "Htoomount" : "Gift Set"}
+                </div>
+                <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 19, fontWeight: 700, color: "#3D1C02", lineHeight: 1.3 }}>
+                    {p.name}
+                </div>
+                <div style={{ fontSize: 12, color: "#b09070", marginBottom: 10 }}>{p.burmese}</div>
+                <p style={{ fontSize: 13, color: "#6b5040", lineHeight: 1.6, marginBottom: 14 }}>{p.desc}</p>
+
+                {/* Flavors */}
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 18 }}>
+                    {p.flavors.map((f) => (
+                        <span key={f} style={{
+                            fontSize: 11, padding: "3px 10px", borderRadius: 20,
+                            background: p.bg, color: p.color, border: `1px solid ${p.color}30`, fontWeight: 500,
+                        }}>
+                            {f}
+                        </span>
+                    ))}
+                </div>
+
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div>
+                        <div style={{ fontWeight: 800, fontSize: 20, color: "#C4501A" }}>
+                            {p.price.toLocaleString()} <span style={{ fontSize: 12, fontWeight: 500, color: "#a08060" }}>Ks</span>
+                        </div>
+                        <div style={{ fontSize: 11, color: "#c0a080" }}>{p.unit}</div>
+                    </div>
+                    <div style={{ display: "flex", gap: 8 }}>
+                        <button
+                            onClick={() => onView(p)}
+                            style={{
+                                padding: "9px 14px", borderRadius: 10, border: `1.5px solid ${p.color}40`,
+                                background: "transparent", color: p.color, fontWeight: 600, fontSize: 13, cursor: "pointer", fontFamily: "inherit",
+                            }}
+                        >
+                            Details
+                        </button>
+                        <motion.button
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() => onAdd(p)}
+                            style={{
+                                padding: "9px 16px", borderRadius: 10, border: "none",
+                                background: `linear-gradient(135deg, ${p.color}, ${p.color}cc)`,
+                                color: "#fff", fontWeight: 700, fontSize: 13, cursor: "pointer", fontFamily: "inherit",
+                            }}
+                        >
+                            + Add
+                        </motion.button>
+                    </div>
+                </div>
+            </div>
         </motion.div>
-      </section>
+    );
+}
 
-      {/* Packaging Showcase Section */}
-      <section className="py-24 bg-card/50 relative">
-        <div className="container mx-auto px-4">
-          <motion.div 
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">Interactive Packaging Design</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Explore the front and back of our new packaging. Click the hotspots to learn more about specific design elements.
-            </p>
-          </motion.div>
+// ─── Product Modal ─────────────────────────────────────────────────────────
 
-          <PackagingShowcase />
-        </div>
-      </section>
+function ProductModal({ p, onClose, onAdd }: ProductModalProps) {
+    return (
+        <AnimatePresence>
+            {p && (
+                <>
+                    <motion.div
+                        key="modal-overlay"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onClick={onClose}
+                        style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", zIndex: 300, backdropFilter: "blur(4px)" }}
+                    />
+                    <motion.div
+                        key="modal-content"
+                        initial={{ opacity: 0, scale: 0.92, y: 20 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.92, y: 20 }}
+                        transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                        style={{
+                            position: "fixed", top: "50%", left: "50%", transform: "translate(-50%,-50%)",
+                            width: "min(600px, 95vw)", background: "#fff", borderRadius: 24, zIndex: 301,
+                            overflow: "hidden", boxShadow: "0 40px 100px rgba(0,0,0,0.3)",
+                        }}
+                    >
+                        <div style={{ height: 200, background: `linear-gradient(135deg, ${p.bg}, #fff9f0)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 90, position: "relative" }}>
+                            {p.img}
+                            <button onClick={onClose} style={{ position: "absolute", top: 16, right: 16, border: "none", background: "rgba(255,255,255,0.8)", borderRadius: 50, width: 36, height: 36, cursor: "pointer", fontSize: 18, color: "#666", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                <X size={18} />
+                            </button>
+                            <BadgeLabel badge={p.badge} />
+                        </div>
+                        <div style={{ padding: "28px 32px 32px" }}>
+                            <div style={{ fontSize: 11, color: "#a08060", fontWeight: 600, textTransform: "uppercase", letterSpacing: "1px" }}>{p.category}</div>
+                            <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 26, fontWeight: 700, color: "#3D1C02", marginTop: 4 }}>{p.name}</div>
+                            <div style={{ fontSize: 14, color: "#b09070", marginBottom: 16 }}>{p.burmese}</div>
+                            <p style={{ fontSize: 14, color: "#5a3d28", lineHeight: 1.7, marginBottom: 20 }}>{p.desc}</p>
+                            <div style={{ marginBottom: 20 }}>
+                                <div style={{ fontSize: 12, fontWeight: 600, color: "#a08060", marginBottom: 8 }}>Available Variants</div>
+                                <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                                    {p.flavors.map((f) => (
+                                        <span key={f} style={{ padding: "6px 14px", borderRadius: 20, background: p.bg, color: p.color, border: `1px solid ${p.color}40`, fontSize: 13, fontWeight: 500 }}>
+                                            {f}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1px solid #f5ede0", paddingTop: 20 }}>
+                                <div>
+                                    <div style={{ fontWeight: 800, fontSize: 26, color: "#C4501A" }}>{p.price.toLocaleString()} Ks</div>
+                                    <div style={{ fontSize: 13, color: "#c0a080" }}>{p.unit}</div>
+                                </div>
+                                <motion.button
+                                    whileTap={{ scale: 0.96 }}
+                                    onClick={() => { onAdd(p); onClose(); }}
+                                    style={{
+                                        padding: "14px 28px", borderRadius: 14, border: "none",
+                                        background: "linear-gradient(135deg, #C4501A, #8B1A1A)", color: "#fff",
+                                        fontWeight: 700, fontSize: 15, cursor: "pointer", fontFamily: "inherit",
+                                    }}
+                                >
+                                    Add to Cart 🛒
+                                </motion.button>
+                            </div>
+                        </div>
+                    </motion.div>
+                </>
+            )}
+        </AnimatePresence>
+    );
+}
 
-      {/* Design Details Grid */}
-      <section className="py-24 relative overflow-hidden">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
-            <motion.div 
-              initial={{ opacity: 0, x: -50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
+// ─── Main App ──────────────────────────────────────────────────────────────
+
+export default function MMCShopProfile() {
+    const [cart, setCart] = useState<CartItem[]>([]);
+    const [cartOpen, setCartOpen] = useState<boolean>(false);
+    const [modalProduct, setModalProduct] = useState<Product | null>(null);
+    const [activeNav, setActiveNav] = useState<string>("Home");
+    const [filterCat, setFilterCat] = useState<FilterCategory>("all");
+    const [menuOpen, setMenuOpen] = useState<boolean>(false);
+    const scrollY = useScrollY();
+    const scrolled = scrollY > 60;
+
+    const addToCart = (p: Product): void => {
+        setCart((c) => {
+            const existing = c.find((i) => i.id === p.id);
+            if (existing) return c.map((i) => i.id === p.id ? { ...i, qty: i.qty + 1 } : i);
+            return [...c, { ...p, qty: 1 }];
+        });
+    };
+
+    const removeFromCart = (id: number): void => setCart((c) => c.filter((i) => i.id !== id));
+
+    const adjustQty = (id: number, delta: number): void =>
+        setCart((c) => c.map((i) => i.id === id ? { ...i, qty: Math.max(1, i.qty + delta) } : i));
+
+    const cartCount = cart.reduce((s, i) => s + i.qty, 0);
+
+    const filtered: Product[] = filterCat === "all" ? PRODUCTS : PRODUCTS.filter((p) => p.category === filterCat);
+
+    const scrollTo = (id: string): void => {
+        document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+        setMenuOpen(false);
+    };
+
+    const navItems: [string, string][] = [
+        ["Home", "home"], ["About", "about"], ["Products", "products"],
+        ["Heritage", "heritage"], ["Store", "store"], ["Contact", "footer"],
+    ];
+
+    const filterTabs: [FilterCategory, string][] = [
+        ["all", "All Products"],
+        ["mooncake", "Mooncakes 🥮"],
+        ["htoomount", "Htoomount 🍡"],
+        ["gift", "Gift Sets 🎁"],
+    ];
+
+    return (
+        <div style={{ fontFamily: "'Lora', Georgia, serif", background: "#FDFAF6", color: "#3D1C02", overflowX: "hidden" }}>
+            <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,800;1,400&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Noto+Serif+Myanmar:wght@400;700&display=swap');
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #fdf5ea; }
+        ::-webkit-scrollbar-thumb { background: #C4501A; border-radius: 3px; }
+        @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
+        @keyframes spin-slow { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+        .desktop-nav { display: flex; }
+        .hamburger { display: none; }
+        @media (max-width: 768px) {
+          .desktop-nav { display: none !important; }
+          .hamburger { display: flex !important; }
+        }
+      `}</style>
+
+            {/* ── Header ── */}
+            <motion.header
+                style={{
+                    position: "fixed", top: 0, left: 0, right: 0, zIndex: 100,
+                    background: scrolled ? "rgba(253,250,246,0.96)" : "transparent",
+                    backdropFilter: scrolled ? "blur(20px)" : "none",
+                    boxShadow: scrolled ? "0 2px 30px rgba(196,80,26,0.1)" : "none",
+                    borderBottom: scrolled ? "1px solid rgba(196,80,26,0.1)" : "none",
+                    transition: "background 0.4s, box-shadow 0.4s, border-color 0.4s",
+                }}
             >
-              <h2 className="text-3xl md:text-4xl font-bold text-primary mb-6">The Essence of Mandalay</h2>
-              <div className="space-y-6">
-                <div className="flex gap-4">
-                  <div className="w-12 h-12 rounded-full bg-secondary/20 flex items-center justify-center shrink-0">
-                    <MapPin className="w-6 h-6 text-secondary-foreground" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold mb-2">Authentic Origin</h3>
-                    <p className="text-muted-foreground">Proudly made in Mandalay, featuring the iconic MMC branding that locals trust and love.</p>
-                  </div>
+                <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px", display: "flex", alignItems: "center", justifyContent: "space-between", height: 70 }}>
+                    {/* Logo */}
+                    <button
+                        onClick={() => scrollTo("home")}
+                        style={{ display: "flex", alignItems: "center", gap: 12, cursor: "pointer", background: "none", border: "none", fontFamily: "inherit" }}
+                    >
+                        <div style={{ width: 44, height: 44, borderRadius: 14, background: "linear-gradient(135deg, #C4501A, #8B1A1A)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, boxShadow: "0 4px 14px rgba(196,80,26,0.4)" }}>
+                            🎑
+                        </div>
+                        <div style={{ textAlign: "left" }}>
+                            <div style={{ fontFamily: "'Playfair Display', serif", fontWeight: 800, fontSize: 18, color: "#3D1C02", lineHeight: 1 }}>MMC</div>
+                            <div style={{ fontSize: 10, color: "#a08060", letterSpacing: "1.5px", textTransform: "uppercase" }}>မြင့်မြင့်ချို</div>
+                        </div>
+                    </button>
+
+                    {/* Desktop Nav */}
+                    <nav className="desktop-nav" style={{ gap: 4, alignItems: "center" }}>
+                        {navItems.map(([label, id]) => (
+                            <button
+                                key={label}
+                                onClick={() => { scrollTo(id); setActiveNav(label); }}
+                                style={{
+                                    padding: "8px 16px", borderRadius: 20, border: "none",
+                                    background: activeNav === label ? "rgba(196,80,26,0.1)" : "transparent",
+                                    color: activeNav === label ? "#C4501A" : "#5a3d28",
+                                    fontWeight: activeNav === label ? 600 : 400, fontSize: 14,
+                                    cursor: "pointer", transition: "all 0.2s", fontFamily: "inherit",
+                                }}
+                            >
+                                {label}
+                            </button>
+                        ))}
+                    </nav>
+
+                    {/* Actions */}
+                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <button style={{
+                            padding: "8px 16px", borderRadius: 20, border: "1.5px solid rgba(196,80,26,0.25)",
+                            background: "transparent", color: "#C4501A", fontWeight: 600, fontSize: 13, cursor: "pointer", fontFamily: "inherit",
+                        }}>
+                            Sign In
+                        </button>
+                        <motion.button
+                            whileTap={{ scale: 0.93 }}
+                            onClick={() => setCartOpen(true)}
+                            style={{
+                                position: "relative", width: 42, height: 42, borderRadius: 12,
+                                background: "linear-gradient(135deg, #C4501A, #8B1A1A)", border: "none",
+                                color: "#fff", fontSize: 18, cursor: "pointer",
+                                boxShadow: "0 4px 14px rgba(196,80,26,0.35)",
+                                display: "flex", alignItems: "center", justifyContent: "center",
+                            }}
+                        >
+                            <ShoppingCart size={20} />
+                            <AnimatePresence>
+                                {cartCount > 0 && (
+                                    <motion.span
+                                        key="badge"
+                                        initial={{ scale: 0 }}
+                                        animate={{ scale: 1 }}
+                                        exit={{ scale: 0 }}
+                                        style={{
+                                            position: "absolute", top: -6, right: -6, background: "#D4A017",
+                                            color: "#fff", borderRadius: 50, width: 20, height: 20,
+                                            fontSize: 11, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center",
+                                            border: "2px solid #FDFAF6",
+                                        }}
+                                    >
+                                        {cartCount}
+                                    </motion.span>
+                                )}
+                            </AnimatePresence>
+                        </motion.button>
+
+                        {/* Hamburger */}
+                        <button
+                            className="hamburger"
+                            onClick={() => setMenuOpen((m) => !m)}
+                            style={{ border: "none", background: "none", fontSize: 22, cursor: "pointer", alignItems: "center", justifyContent: "center", color: "#3D1C02" }}
+                        >
+                            <Menu size={24} />
+                        </button>
+                    </div>
                 </div>
-                <div className="flex gap-4">
-                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                    <Coffee className="w-6 h-6 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold mb-2">Premium Ingredients</h3>
-                    <p className="text-muted-foreground">Infused with rich, aromatic coffee to create a unique twist on the traditional mooncake filling.</p>
-                  </div>
+
+                {/* Mobile menu */}
+                <AnimatePresence>
+                    {menuOpen && (
+                        <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            style={{ background: "rgba(253,250,246,0.98)", overflow: "hidden" }}
+                        >
+                            <div style={{ padding: "12px 24px 20px" }}>
+                                {navItems.map(([label, id]) => (
+                                    <button
+                                        key={label}
+                                        onClick={() => scrollTo(id)}
+                                        style={{
+                                            display: "block", width: "100%", textAlign: "left",
+                                            padding: "10px 0", border: "none", background: "none",
+                                            color: "#3D1C02", fontSize: 16, cursor: "pointer",
+                                            fontFamily: "inherit", borderBottom: "1px solid #f5ede0",
+                                        }}
+                                    >
+                                        {label}
+                                    </button>
+                                ))}
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </motion.header>
+
+            <CartDrawer cart={cart} open={cartOpen} onClose={() => setCartOpen(false)} onRemove={removeFromCart} onQty={adjustQty} />
+            <ProductModal p={modalProduct} onClose={() => setModalProduct(null)} onAdd={addToCart} />
+
+            {/* ── Hero ── */}
+            <section id="home" style={{ minHeight: "100vh", position: "relative", display: "flex", alignItems: "center", overflow: "hidden", background: "linear-gradient(160deg, #3D1C02 0%, #6F3010 45%, #C4501A 100%)" }}>
+                {/* Decorative rings */}
+                {([400, 280, 180, 120, 60] as number[]).map((size, i) => (
+                    <div key={i} style={{
+                        position: "absolute", borderRadius: "50%",
+                        width: size, height: size,
+                        border: "1px solid rgba(255,255,255,0.08)",
+                        top: `${[10, 30, 60, 20, 70][i]}%`,
+                        left: `${[60, 70, 80, 55, 75][i]}%`,
+                        animation: `spin-slow ${[40, 30, 20, 15, 10][i]}s linear infinite`,
+                        animationDirection: i % 2 === 0 ? "normal" : "reverse",
+                    }} />
+                ))}
+
+                <div style={{ position: "absolute", right: "5%", top: "50%", transform: "translateY(-50%)", fontSize: 220, opacity: 0.06, lineHeight: 1, userSelect: "none", animation: "float 6s ease-in-out infinite" }}>🎑</div>
+
+                <div style={{ maxWidth: 1200, margin: "0 auto", padding: "100px 24px 60px", position: "relative", zIndex: 2 }}>
+                    <motion.div variants={stagger} initial="hidden" animate="visible">
+                        <motion.div variants={fadeUp} transition={{ duration: 0.7, delay: 0.1 }}>
+                            <span style={{ display: "inline-block", padding: "6px 18px", borderRadius: 20, border: "1px solid rgba(255,255,255,0.3)", color: "rgba(255,255,255,0.8)", fontSize: 12, letterSpacing: "2px", textTransform: "uppercase", marginBottom: 28, backdropFilter: "blur(10px)", background: "rgba(255,255,255,0.05)" }}>
+                                🏮 Since 1998 · Mandalay, Myanmar
+                            </span>
+                        </motion.div>
+
+                        <motion.h1 variants={fadeUp} transition={{ duration: 0.7, delay: 0.25 }} style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(42px, 7vw, 88px)", fontWeight: 800, color: "#fff", lineHeight: 1.1, marginBottom: 12 }}>
+                            Myint Myint<br />Cho <em style={{ color: "#D4A017" }}>Factory</em>
+                        </motion.h1>
+
+                        <motion.div variants={fadeUp} transition={{ duration: 0.7, delay: 0.3 }} style={{ fontFamily: "'Noto Serif Myanmar', serif", fontSize: "clamp(18px, 3vw, 28px)", color: "rgba(255,255,255,0.6)", marginBottom: 32 }}>
+                            မြင့်မြင့်ချို ထူးမောင့်နှင့် လမုန့်စက်ရုံ
+                        </motion.div>
+
+                        <motion.p variants={fadeUp} transition={{ duration: 0.7, delay: 0.4 }} style={{ fontSize: "clamp(15px, 2vw, 18px)", color: "rgba(255,255,255,0.75)", maxWidth: 520, lineHeight: 1.8, marginBottom: 44 }}>
+                            Mandalay's most beloved confectionery house — crafting authentic <em>Htoomount</em> and traditional <em>Mooncakes</em> with heritage recipes and premium local ingredients.
+                        </motion.p>
+
+                        <motion.div variants={fadeUp} transition={{ duration: 0.7, delay: 0.5 }} style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
+                            <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }} onClick={() => scrollTo("products")} style={{ padding: "16px 32px", borderRadius: 14, border: "none", background: "#D4A017", color: "#3D1C02", fontWeight: 700, fontSize: 16, cursor: "pointer", fontFamily: "inherit", boxShadow: "0 8px 30px rgba(212,160,23,0.4)", display: "flex", alignItems: "center", gap: 8 }}>
+                                Shop Now 🛍️
+                            </motion.button>
+                            <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }} onClick={() => scrollTo("about")} style={{ padding: "16px 32px", borderRadius: 14, border: "1.5px solid rgba(255,255,255,0.3)", background: "rgba(255,255,255,0.08)", color: "#fff", fontWeight: 600, fontSize: 16, cursor: "pointer", fontFamily: "inherit", backdropFilter: "blur(10px)", display: "flex", alignItems: "center", gap: 8 }}>
+                                Our Story <ArrowRight size={18} />
+                            </motion.button>
+                        </motion.div>
+
+                        {/* Stats */}
+                        <motion.div variants={fadeUp} transition={{ duration: 0.7, delay: 0.65 }} style={{ display: "flex", gap: 40, marginTop: 64, flexWrap: "wrap" }}>
+                            {([["25+", "Years of Craft"], ["50K+", "Happy Customers"], ["30+", "Product Varieties"], ["4.9★", "Average Rating"]] as [string, string][]).map(([n, l]) => (
+                                <div key={l}>
+                                    <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 32, fontWeight: 800, color: "#D4A017" }}>{n}</div>
+                                    <div style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", marginTop: 2 }}>{l}</div>
+                                </div>
+                            ))}
+                        </motion.div>
+                    </motion.div>
                 </div>
-              </div>
-            </motion.div>
-            
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-              className="relative"
-            >
-              <div className="absolute inset-0 bg-gradient-to-tr from-secondary/20 to-transparent rounded-2xl transform rotate-3" />
-              <img 
-                src="/images/front.png" 
-                alt="Packaging Detail" 
-                className="relative rounded-2xl shadow-2xl border border-white/20 w-full max-w-md mx-auto transform -rotate-3 hover:rotate-0 transition-transform duration-500"
-              />
-            </motion.div>
-          </div>
+
+                {/* Wave divider */}
+                <svg style={{ position: "absolute", bottom: -1, left: 0, right: 0, width: "100%" }} viewBox="0 0 1440 80" preserveAspectRatio="none">
+                    <path d="M0,40 C360,80 1080,0 1440,40 L1440,80 L0,80 Z" fill="#FDFAF6" />
+                </svg>
+            </section>
+
+            {/* ── About ── */}
+            <section id="about" style={{ padding: "100px 24px", maxWidth: 1200, margin: "0 auto" }}>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 64, alignItems: "center" }}>
+                    <AnimSection>
+                        <div style={{ position: "relative" }}>
+                            <div style={{ width: "100%", aspectRatio: "4/3", borderRadius: 24, background: "linear-gradient(135deg, #8B1A1A, #C4501A, #D4A017)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 120, boxShadow: "0 30px 80px rgba(196,80,26,0.3)" }}>
+                                🏭
+                            </div>
+                            <div style={{ position: "absolute", bottom: -20, right: -20, background: "#fff", borderRadius: 20, padding: "16px 20px", boxShadow: "0 10px 40px rgba(0,0,0,0.12)", border: "1px solid #f0e6d3" }}>
+                                <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 28, fontWeight: 800, color: "#C4501A" }}>1998</div>
+                                <div style={{ fontSize: 12, color: "#a08060" }}>Founded in Mandalay</div>
+                            </div>
+                        </div>
+                    </AnimSection>
+                    <AnimSection delay={0.2}>
+                        <span style={{ display: "inline-block", padding: "5px 16px", borderRadius: 20, background: "rgba(196,80,26,0.08)", color: "#C4501A", fontSize: 12, fontWeight: 600, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: 20 }}>About Us</span>
+                        <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(30px, 4vw, 44px)", fontWeight: 800, color: "#3D1C02", lineHeight: 1.2, marginBottom: 20 }}>
+                            A Family Legacy<br /><em style={{ color: "#C4501A" }}>Born in Mandalay</em>
+                        </h2>
+                        <p style={{ fontSize: 16, color: "#5a3d28", lineHeight: 1.8, marginBottom: 16 }}>
+                            Myint Myint Cho — locally known as <strong>MMC</strong> — began as a small family kitchen in Mandalay in 1998. Founded by Daw Myint Myint Cho with a single <em>Htoomount</em> recipe inherited from her grandmother, the factory has grown into one of Mandalay's most celebrated confectionery brands.
+                        </p>
+                        <p style={{ fontSize: 16, color: "#5a3d28", lineHeight: 1.8, marginBottom: 28 }}>
+                            Today, we produce over 30 varieties of traditional Burmese sweets, mooncakes, and seasonal treats — all crafted by hand using locally sourced palm sugar, glutinous rice, and Mandalay's finest sesame.
+                        </p>
+                        {([["🌾", "100% Local Ingredients"], ["👐", "Handcrafted Daily"], ["📦", "Nationwide Delivery"], ["🏆", "Award-Winning Recipes"]] as [string, string][]).map(([icon, text]) => (
+                            <div key={text} style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
+                                <span style={{ fontSize: 20 }}>{icon}</span>
+                                <span style={{ fontSize: 15, fontWeight: 500, color: "#4a2c12" }}>{text}</span>
+                            </div>
+                        ))}
+                    </AnimSection>
+                </div>
+            </section>
+
+            {/* ── Products ── */}
+            <section id="products" style={{ padding: "80px 24px 100px", background: "linear-gradient(180deg, #fdf5ea 0%, #FDFAF6 100%)" }}>
+                <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+                    <AnimSection>
+                        <div style={{ textAlign: "center", marginBottom: 48 }}>
+                            <span style={{ display: "inline-block", padding: "5px 16px", borderRadius: 20, background: "rgba(196,80,26,0.08)", color: "#C4501A", fontSize: 12, fontWeight: 600, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: 16 }}>Our Products</span>
+                            <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(30px, 4vw, 48px)", fontWeight: 800, color: "#3D1C02", marginBottom: 14 }}>Crafted with Love & Tradition</h2>
+                            <p style={{ fontSize: 16, color: "#7a5a3a", maxWidth: 560, margin: "0 auto" }}>Every item is made fresh daily, using recipes perfected over a quarter century in the heart of Mandalay.</p>
+                        </div>
+                    </AnimSection>
+
+                    {/* Filter tabs */}
+                    <AnimSection delay={0.1}>
+                        <div style={{ display: "flex", justifyContent: "center", gap: 10, marginBottom: 40, flexWrap: "wrap" }}>
+                            {filterTabs.map(([val, label]) => (
+                                <motion.button
+                                    key={val}
+                                    whileTap={{ scale: 0.96 }}
+                                    onClick={() => setFilterCat(val)}
+                                    style={{
+                                        padding: "10px 22px", borderRadius: 24, border: "1.5px solid",
+                                        borderColor: filterCat === val ? "#C4501A" : "#e8d5bb",
+                                        background: filterCat === val ? "#C4501A" : "#fff",
+                                        color: filterCat === val ? "#fff" : "#7a5a3a",
+                                        fontWeight: filterCat === val ? 700 : 400,
+                                        fontSize: 14, cursor: "pointer", fontFamily: "inherit", transition: "all 0.2s",
+                                    }}
+                                >
+                                    {label}
+                                </motion.button>
+                            ))}
+                        </div>
+                    </AnimSection>
+
+                    <motion.div
+                        layout
+                        style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 28 }}
+                    >
+                        <AnimatePresence mode="popLayout">
+                            {filtered.map((p, i) => (
+                                <motion.div
+                                    key={p.id}
+                                    layout
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, scale: 0.9 }}
+                                    transition={{ delay: i * 0.06 }}
+                                >
+                                    <ProductCard p={p} onAdd={addToCart} onView={setModalProduct} />
+                                </motion.div>
+                            ))}
+                        </AnimatePresence>
+                    </motion.div>
+                </div>
+            </section>
+
+            {/* ── Heritage ── */}
+            <section id="heritage" style={{ padding: "100px 24px", background: "linear-gradient(160deg, #3D1C02 0%, #5a2d10 100%)", position: "relative", overflow: "hidden" }}>
+                <div style={{ position: "absolute", inset: 0, opacity: 0.04, pointerEvents: "none" }}>
+                    {Array.from({ length: 20 }).map((_, i) => (
+                        <span key={i} style={{ position: "absolute", fontSize: 40, top: `${(i * 23) % 100}%`, left: `${(i * 17) % 100}%` }}>🎑</span>
+                    ))}
+                </div>
+                <div style={{ maxWidth: 1200, margin: "0 auto", position: "relative", zIndex: 2 }}>
+                    <AnimSection>
+                        <div style={{ textAlign: "center", marginBottom: 64 }}>
+                            <span style={{ display: "inline-block", padding: "5px 16px", borderRadius: 20, background: "rgba(212,160,23,0.2)", color: "#D4A017", fontSize: 12, fontWeight: 600, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: 16 }}>Heritage</span>
+                            <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(30px, 4vw, 48px)", fontWeight: 800, color: "#fff", marginBottom: 14 }}>
+                                The Soul of <em style={{ color: "#D4A017" }}>Mandalay</em>
+                            </h2>
+                            <p style={{ fontSize: 16, color: "rgba(255,255,255,0.65)", maxWidth: 600, margin: "0 auto" }}>
+                                Our confections are deeply rooted in the cultural tapestry of Mandalay — where tradition, craftsmanship, and community intertwine.
+                            </p>
+                        </div>
+                    </AnimSection>
+
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 24 }}>
+                        {([
+                            { icon: "🏯", title: "Royal City Roots", desc: "Mandalay — Myanmar's last royal capital — has a centuries-old tradition of handcrafted sweets. MMC carries this royal confectionery legacy forward." },
+                            { icon: "🌾", title: "Irrawaddy Ingredients", desc: "Our palm sugar comes from the banks of the Irrawaddy. Our glutinous rice from the Sagaing region. Every ingredient tells the story of the land." },
+                            { icon: "🎋", title: "Festival Culture", desc: "Htoomount and mooncakes are central to Burmese festivals — Thingyan, Thadingyut, and beyond. MMC is the preferred brand for celebrations." },
+                            { icon: "👨‍👩‍👧", title: "Three Generations", desc: "The original recipes were passed from grandmother to mother to daughter. Today, Daw Myint Myint Cho's children continue the family craft." },
+                        ] as { icon: string; title: string; desc: string }[]).map((item, i) => (
+                            <AnimSection key={item.title} delay={i * 0.1}>
+                                <motion.div
+                                    whileHover={{ borderColor: "rgba(212,160,23,0.4)", background: "rgba(255,255,255,0.07)" }}
+                                    style={{ padding: "32px", borderRadius: 20, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.04)", backdropFilter: "blur(10px)", height: "100%", transition: "all 0.3s" }}
+                                >
+                                    <div style={{ fontSize: 40, marginBottom: 16 }}>{item.icon}</div>
+                                    <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 20, fontWeight: 700, color: "#fff", marginBottom: 12 }}>{item.title}</h3>
+                                    <p style={{ fontSize: 14, color: "rgba(255,255,255,0.6)", lineHeight: 1.7 }}>{item.desc}</p>
+                                </motion.div>
+                            </AnimSection>
+                        ))}
+                    </div>
+
+                    {/* Popular products spotlight */}
+                    <AnimSection delay={0.2}>
+                        <div style={{ marginTop: 64, padding: "40px", borderRadius: 24, background: "rgba(212,160,23,0.1)", border: "1px solid rgba(212,160,23,0.2)" }}>
+                            <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 26, fontWeight: 700, color: "#D4A017", marginBottom: 8 }}>⭐ Our Most Beloved Creations</h3>
+                            <p style={{ color: "rgba(255,255,255,0.6)", marginBottom: 28, fontSize: 14 }}>The products that define MMC's legacy across Mandalay</p>
+                            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16 }}>
+                                {([
+                                    { emoji: "☕", name: "Coffee Mooncake", reason: "A daring fusion of Burmese tradition and modern coffee culture" },
+                                    { emoji: "🟡", name: "Golden Htoomount", reason: "The original MMC recipe — unchanged since 1998" },
+                                    { emoji: "🎁", name: "Heritage Gift Box", reason: "Mandalay's most gifted set for festivals and celebrations" },
+                                ] as { emoji: string; name: string; reason: string }[]).map((item) => (
+                                    <div key={item.name} style={{ padding: 20, borderRadius: 16, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                                        <div style={{ fontSize: 40, marginBottom: 10 }}>{item.emoji}</div>
+                                        <div style={{ fontWeight: 700, color: "#fff", fontSize: 16, marginBottom: 6 }}>{item.name}</div>
+                                        <div style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", lineHeight: 1.5 }}>{item.reason}</div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </AnimSection>
+                </div>
+            </section>
+
+            {/* ── Store / Location ── */}
+            <section id="store" style={{ padding: "100px 24px" }}>
+                <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+                    <AnimSection>
+                        <div style={{ textAlign: "center", marginBottom: 60 }}>
+                            <span style={{ display: "inline-block", padding: "5px 16px", borderRadius: 20, background: "rgba(196,80,26,0.08)", color: "#C4501A", fontSize: 12, fontWeight: 600, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: 16 }}>Find Us</span>
+                            <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(30px, 4vw, 48px)", fontWeight: 800, color: "#3D1C02", marginBottom: 14 }}>Visit Our Factory & Stores</h2>
+                            <p style={{ fontSize: 16, color: "#7a5a3a", maxWidth: 500, margin: "0 auto" }}>Come taste fresh from the source, or find us at one of our locations across Mandalay.</p>
+                        </div>
+                    </AnimSection>
+
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 28 }}>
+                        {STORE_LOCATIONS.map((loc, i) => (
+                            <AnimSection key={loc.name} delay={i * 0.12}>
+                                <div style={{
+                                    padding: "28px", borderRadius: 20, height: "100%",
+                                    background: loc.highlight ? "linear-gradient(135deg, #C4501A, #8B1A1A)" : "#fff",
+                                    border: loc.highlight ? "none" : "1px solid #f0e6d3",
+                                    boxShadow: loc.highlight ? "0 20px 60px rgba(196,80,26,0.3)" : "0 4px 20px rgba(0,0,0,0.05)",
+                                    color: loc.highlight ? "#fff" : "#3D1C02",
+                                }}>
+                                    <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: loc.highlight ? "rgba(255,255,255,0.8)" : "#C4501A", letterSpacing: "0.5px" }}>{loc.type}</div>
+                                    <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 20, fontWeight: 700, marginBottom: 14 }}>{loc.name}</h3>
+                                    <div style={{ fontSize: 14, lineHeight: 1.7, color: loc.highlight ? "rgba(255,255,255,0.85)" : "#5a3d28", marginBottom: 16 }}>{loc.addr}</div>
+                                    <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 20 }}>
+                                        <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, opacity: 0.75 }}>
+                                            <Clock size={14} /><span>{loc.hours}</span>
+                                        </div>
+                                        <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, opacity: 0.75 }}>
+                                            <Phone size={14} /><span>{loc.phone}</span>
+                                        </div>
+                                    </div>
+                                    <button style={{
+                                        width: "100%", padding: "12px", borderRadius: 12,
+                                        border: loc.highlight ? "1px solid rgba(255,255,255,0.3)" : "1.5px solid #C4501A",
+                                        background: loc.highlight ? "rgba(255,255,255,0.15)" : "transparent",
+                                        color: loc.highlight ? "#fff" : "#C4501A",
+                                        fontWeight: 600, fontSize: 14, cursor: "pointer", fontFamily: "inherit",
+                                    }}>
+                                        {loc.type.includes("Online") ? "Order Online →" : "Get Directions →"}
+                                    </button>
+                                </div>
+                            </AnimSection>
+                        ))}
+                    </div>
+
+                    {/* Extra info */}
+                    <AnimSection delay={0.3}>
+                        <div style={{ marginTop: 48, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 20 }}>
+                            {([
+                                ["🚚", "Free Delivery", "Within Mandalay on orders 10,000+ Ks"],
+                                ["🎀", "Gift Wrapping", "Traditional Mandalay fabric wrapping available"],
+                                ["📱", "WhatsApp Orders", "Quick order via +95 9 111 2233"],
+                                ["♻️", "Eco Packaging", "All packaging is biodegradable & locally made"],
+                            ] as [string, string, string][]).map(([icon, title, desc]) => (
+                                <div key={title} style={{ padding: "20px", borderRadius: 16, background: "#fdf5ea", border: "1px solid #f0e6d3", textAlign: "center" }}>
+                                    <div style={{ fontSize: 30, marginBottom: 10 }}>{icon}</div>
+                                    <div style={{ fontWeight: 700, color: "#3D1C02", fontSize: 15, marginBottom: 6 }}>{title}</div>
+                                    <div style={{ fontSize: 13, color: "#7a5a3a", lineHeight: 1.5 }}>{desc}</div>
+                                </div>
+                            ))}
+                        </div>
+                    </AnimSection>
+                </div>
+            </section>
+
+            {/* ── CTA Banner ── */}
+            <section style={{ padding: "0 24px 80px", maxWidth: 1200, margin: "0 auto" }}>
+                <AnimSection>
+                    <div style={{ borderRadius: 28, background: "linear-gradient(135deg, #D4A017 0%, #C4501A 60%, #8B1A1A 100%)", padding: "60px 40px", textAlign: "center", position: "relative", overflow: "hidden" }}>
+                        <div style={{ position: "absolute", inset: 0, opacity: 0.07, pointerEvents: "none" }}>
+                            {Array.from({ length: 6 }).map((_, i) => (
+                                <span key={i} style={{ position: "absolute", fontSize: 80, top: `${[10, 40, 70, 20, 60, 50][i]}%`, left: `${[5, 20, 50, 70, 85, 40][i]}%`, opacity: 0.5 }}>🎑</span>
+                            ))}
+                        </div>
+                        <div style={{ position: "relative", zIndex: 2 }}>
+                            <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(26px, 4vw, 44px)", fontWeight: 800, color: "#fff", marginBottom: 12 }}>Order Fresh Today</h2>
+                            <p style={{ fontSize: 16, color: "rgba(255,255,255,0.8)", maxWidth: 480, margin: "0 auto 32px" }}>
+                                All products made fresh every morning. Order by 12 PM for same-day delivery in Mandalay.
+                            </p>
+                            <motion.button
+                                whileHover={{ scale: 1.04 }}
+                                whileTap={{ scale: 0.96 }}
+                                onClick={() => scrollTo("products")}
+                                style={{ padding: "16px 36px", borderRadius: 14, border: "none", background: "#fff", color: "#C4501A", fontWeight: 800, fontSize: 17, cursor: "pointer", fontFamily: "inherit", boxShadow: "0 8px 30px rgba(0,0,0,0.2)" }}
+                            >
+                                Browse All Products 🛍️
+                            </motion.button>
+                        </div>
+                    </div>
+                </AnimSection>
+            </section>
+
+            {/* ── Footer ── */}
+            <footer id="footer" style={{ background: "#1a0a00", color: "rgba(255,255,255,0.75)", padding: "60px 24px 0" }}>
+                <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 40, paddingBottom: 48, borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+                        <div>
+                            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
+                                <div style={{ width: 40, height: 40, borderRadius: 12, background: "linear-gradient(135deg, #C4501A, #8B1A1A)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>🎑</div>
+                                <div>
+                                    <div style={{ fontFamily: "'Playfair Display', serif", fontWeight: 800, fontSize: 18, color: "#fff" }}>MMC</div>
+                                    <div style={{ fontSize: 10, color: "#a08060", letterSpacing: "1.5px" }}>မြင့်မြင့်ချို</div>
+                                </div>
+                            </div>
+                            <p style={{ fontSize: 14, lineHeight: 1.7, color: "rgba(255,255,255,0.5)" }}>
+                                Authentic Burmese confections crafted with tradition, love, and the finest local ingredients since 1998.
+                            </p>
+                            <div style={{ display: "flex", gap: 10, marginTop: 20, flexWrap: "wrap" }}>
+                                {["📘 Facebook", "📸 Instagram", "💬 WhatsApp"].map((s) => (
+                                    <button key={s} style={{ padding: "7px 12px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.6)", fontSize: 12, cursor: "pointer", fontFamily: "inherit" }}>
+                                        {s}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {FOOTER_COLUMNS.map((col) => (
+                            <div key={col.title}>
+                                <h4 style={{ fontFamily: "'Playfair Display', serif", fontSize: 16, fontWeight: 700, color: "#fff", marginBottom: 18 }}>{col.title}</h4>
+                                {col.links.map((l) => (
+                                    <motion.div
+                                        key={l}
+                                        whileHover={{ color: "#D4A017", x: 4 }}
+                                        style={{ marginBottom: 10, fontSize: 14, cursor: "pointer", color: "rgba(255,255,255,0.5)" }}
+                                    >
+                                        {l}
+                                    </motion.div>
+                                ))}
+                            </div>
+                        ))}
+                    </div>
+
+                    <div style={{ padding: "24px 0", display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
+                        <div style={{ fontSize: 13, color: "rgba(255,255,255,0.35)" }}>© 2026 Myint Myint Cho (MMC). All rights reserved.</div>
+                        <div style={{ fontSize: 13, color: "rgba(255,255,255,0.35)" }}>🏮 Handcrafted in Mandalay, Myanmar · မန္တလေးမြို့မှ ချစ်ခြင်းမေတ္တာဖြင့် ❤️</div>
+                    </div>
+                </div>
+            </footer>
         </div>
-      </section>
-
-      {/* Data Visualization Section */}
-      <section className="py-24 bg-muted/30">
-        <div className="container mx-auto px-4">
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">Market & Flavor Analysis</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Understanding the trends and taste profile that drove this product innovation.
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <motion.div 
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-              className="bg-card rounded-xl p-6 shadow-sm border border-border/50"
-            >
-              <MarketTrendsChart />
-            </motion.div>
-            <motion.div 
-              initial={{ opacity: 0, x: 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.4 }}
-              className="bg-card rounded-xl p-6 shadow-sm border border-border/50"
-            >
-              <FlavorProfileRadar />
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* Call to Action / Footer */}
-      <section className="py-20 bg-primary text-primary-foreground relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10 pattern-grid-lg" />
-        <div className="container mx-auto px-4 text-center relative z-10">
-          <h2 className="text-3xl md:text-5xl font-bold mb-8 font-serif">Ready to Share?</h2>
-          <p className="text-primary-foreground/80 text-lg mb-10 max-w-2xl mx-auto">
-            Download the complete design package or share this interactive presentation with your stakeholders.
-          </p>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" variant="secondary" className="rounded-full px-8 h-14 text-lg font-semibold shadow-lg">
-              <Download className="mr-2 h-5 w-5" /> Download Assets
-            </Button>
-            <Button size="lg" variant="outline" className="rounded-full px-8 h-14 text-lg font-semibold bg-transparent border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10">
-              <Share2 className="mr-2 h-5 w-5" /> Share Presentation
-            </Button>
-          </div>
-
-          <div className="mt-20 pt-8 border-t border-primary-foreground/20 flex flex-col md:flex-row justify-between items-center text-sm text-primary-foreground/60">
-            <p>© 2024 Myint Myint Cho (MMC). All rights reserved.</p>
-            <p>Designed with ❤️ in Mandalay</p>
-          </div>
-        </div>
-      </section>
-    </div>
-  );
+    );
 }
