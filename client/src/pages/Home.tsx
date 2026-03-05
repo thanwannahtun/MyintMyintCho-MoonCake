@@ -68,7 +68,7 @@ interface ProductModalProps {
 
 // ─── Data ──────────────────────────────────────────────────────────────────
 
-const PRODUCTS: Product[] = [
+const PRODUCTSS: Product[] = [
     {
         id: 1, category: "mooncake", badge: "Signature",
         name: "Coffee Mooncake", burmese: "ကော်ဖီလမုန့်",
@@ -95,7 +95,7 @@ const PRODUCTS: Product[] = [
     },
     {
         id: 4, category: "htoomount", badge: "Bestseller",
-        name: "Golden Htoomount", burmese: "ရွှေထူးမောင့်",
+        name: "Golden Htoomount", burmese: "ရွှေထိုးမုန့်",
         price: 1800, unit: "per 500g",
         desc: "Mandalay's pride — steamed glutinous rice with palm sugar and sesame. Soft, chewy, and deeply aromatic.",
         flavors: ["Original", "Black Sesame", "Coconut"],
@@ -103,7 +103,7 @@ const PRODUCTS: Product[] = [
     },
     {
         id: 5, category: "htoomount", badge: "Seasonal",
-        name: "Jackfruit Htoomount", burmese: "ဖရဲသီးထူးမောင့်",
+        name: "Jackfruit Htoomount", burmese: "ဖရဲသီးထိုးမုန့်",
         price: 2200, unit: "per 500g",
         desc: "Fresh ripe jackfruit folded into our signature glutinous base. A seasonal delight celebrating Mandalay summers.",
         flavors: ["Sweet", "Extra Sweet"],
@@ -119,38 +119,115 @@ const PRODUCTS: Product[] = [
     },
 ];
 
+const PRODUCTS: Product[] = [
+    {
+        id: 1, category: "mooncake", badge: "Signature",
+        name: "Coffee Mooncake", burmese: "ကော်ဖီလမုန့်",
+        price: 4500, unit: "၁ ဘူး (၄ ခုပါ)",
+        desc: "မန္တလေးကော်ဖီစစ်စစ်ရဲ့ ရနံ့သင်းပျံ့မှုကို ကြာစေ့ယိုနဲ့ အချိုးကျစပ်ဟပ်ထားပြီး ရွှေရောင်ဝင်းနေတဲ့ မုန့်သားအလွှာလေးနဲ့ ထုပ်ပိုးထားပါတယ်။ MMC ရဲ့ အနှစ်သက်ဆုံး လက်ရာတစ်ခုပါ။",
+        flavors: ["Espresso", "White Coffee", "Robusta Blend"],
+        img: "☕", color: "#6F4E37", bg: "#FFF8F2",
+    },
+    {
+        id: 2, category: "mooncake", badge: "Classic",
+        name: "Lotus Seed Mooncake", burmese: "ကြာစေ့လမုန့်",
+        price: 3800, unit: "၁ ဘူး (၄ ခုပါ)",
+        desc: "မိသားစုမျိုးဆက် ၃ ဆက်တိုင် လက်ဆင့်ကမ်းလာတဲ့ ရိုးရာနည်းစနစ်အတိုင်း ကြာစေ့ယိုနဲ့ ဘဲဥငန်နှစ်ကို အချိုးကျထည့်သွင်းဖန်တီးထားတဲ့ ဂန္ထဝင်လမုန့်ပါ။",
+        flavors: ["ဘဲဥတစ်လုံး", "ဘဲဥနှစ်လုံး", "ဘဲဥမပါ"],
+        img: "🌸", color: "#C9A96E", bg: "#FFFBF2",
+    },
+    {
+        id: 3, category: "mooncake", badge: "New",
+        name: "Pandan Coconut Mooncake", burmese: "ဆွမ်းမွှေးအုန်းနို့လမုန့်",
+        price: 4200, unit: "၁ ဘူး (၄ ခုပါ)",
+        desc: "ဆွမ်းမွှေးရနံ့သင်းသင်းလေးနဲ့ ဧရာဝတီမြစ်ဝှမ်းထွက် အုန်းနို့ဆီရဲ့ ဆိမ့်အိမှုကို ပေါင်းစပ်ပေးထားတဲ့ မြန်မာ့အငွေ့အသက်ပါတဲ့ လမုန့်အသစ်ပါ။",
+        flavors: ["Classic", "Toasted Coconut"],
+        img: "🥥", color: "#2D6A4F", bg: "#F0FFF4",
+    },
+    {
+        id: 4, category: "htoomount", badge: "Bestseller",
+        name: "Golden Htoomount", burmese: "ရွှေထိုးမုန့်",
+        price: 1800, unit: "၅၀ သား (တစ်ထုပ်)",
+        desc: "မန္တလေးရဲ့ ဂုဏ်ဆောင် - ကောက်ညှင်း၊ ထန်းလျက်နဲ့ နှမ်းတို့ရဲ့ မွှေးရနံ့ကို အပြည့်အဝရရှိစေမှာပါ။ နူးညံ့စေးပိုင်တဲ့ အရသာက စားဖူးသူတိုင်း အကြိုက်တွေ့စေမှာပါ။",
+        flavors: ["ရိုးရာအရသာ", "နှမ်းနက်", "အုန်းသီး"],
+        img: "🟡", color: "#D4A017", bg: "#FFFDF0",
+    },
+    {
+        id: 5, category: "htoomount", badge: "Seasonal",
+        name: "Jackfruit Htoomount", burmese: "ပိန္နဲသီးထိုးမုန့်",
+        price: 2200, unit: "၅၀ သား (တစ်ထုပ်)",
+        desc: "မန္တလေးနွေရာသီရဲ့ အထိမ်းအမှတ်အဖြစ် မှည့်ဝင်းနေတဲ့ ပိန္နဲသီးအနှစ်တွေကို ရိုးရာထိုးမုန့်သားထဲ ထည့်သွင်းပြုလုပ်ထားတဲ့ ရာသီပေါ် မုန့်ကောင်းလေးပါ။",
+        flavors: ["အချို", "အချိုကဲ"],
+        img: "🍈", color: "#E8A000", bg: "#FFFAEB",
+    },
+    {
+        id: 6, category: "gift", badge: "Gift Set",
+        name: "Heritage Gift Box", burmese: "မြန်မာ့အမွေအနှစ် လက်ဆောင်ပုံး",
+        price: 18500, unit: "၁ ပုံး",
+        desc: "လမုန့် ၂ ခုနဲ့ ထိုးမုန့် ၂ မျိုးကို မန္တလေးရိုးရာ အထည်အလိပ်လေးတွေနဲ့ လှပစွာ ထုပ်ပိုးပေးထားတဲ့ အဆင့်မြင့် လက်ဆောင်ပုံးလေးပါ။",
+        flavors: ["အစုံ"],
+        img: "🎁", color: "#8B1A1A", bg: "#FFF5F5",
+    },
+];
+
 const STORE_LOCATIONS: StoreLocation[] = [
     {
-        type: "🏭 Main Factory",
-        name: "MMC Production Factory",
-        addr: "No. 45, Sein Pan Road, Chan Aye Thar Zan Township, Mandalay",
-        hours: "Mon–Sat: 7:00 AM – 5:00 PM",
-        phone: "+95 2 123 4567",
+        type: "🏭 ပင်ရင်းစက်ရုံ",
+        name: "မြင့်မြင့်ချို (MMC) မုန့်ထုတ်လုပ်ရေးစက်ရုံ",
+        addr: "အမှတ် ၄၅, 73 x 74, 120 လမ်း, ပြည်ကြီးတံခွန်မြို့နယ်, မန္တလေးမြို့",
+        hours: "တနင်္လာ - စနေ (နံနက် ၇:၀၀ မှ ညနေ ၅:၀၀ ထိ)",
+        phone: "+959 4310 3121",
         highlight: true,
     },
     {
         type: "🏪 Showroom",
-        name: "MMC Mandalay Central",
-        addr: "No. 12, 83rd Street, Aung Myay Thar Zan Township, Mandalay",
-        hours: "Daily: 8:00 AM – 8:00 PM",
-        phone: "+95 9 876 5432",
+        name: "မြင့်မြင့်ချို (MMC) မန္တလေး ဆိုင်ခွဲ",
+        addr: "အမှတ် ၁၂, 83rd Street, Aung Myay Thar Zan Township, Mandalay",
+        hours: "နေ့စဉ် (နံနက် ၈:၀၀ မှ ည ၈:၀၀ ထိ)",
+        phone: "+959 257 498 009",
         highlight: false,
     },
     {
-        type: "📦 Online Store",
+        type: "📦 အွန်လိုင်းမှ မှာယူရန်",
         name: "MMC Online Shop",
-        addr: "Delivers across all Myanmar. Free delivery in Mandalay for orders over 10,000 Ks.",
-        hours: "Orders: 24/7 · Dispatch: Mon–Sat",
-        phone: "+95 9 111 2233",
+        addr: "မြန်မာပြည်အနှံ့ ပို့ဆောင်ပေးပါသည်။ မန္တလေးမြို့တွင်း မှာယူမှု ၃၀,၀၀၀ ကျပ်နှင့်အထက်ကို ပို့ခအခမဲ့ (Free Delivery) ဖြင့် ဝန်ဆောင်မှုပေးနေပါသည်။",
+        hours: "ပို့ဆောင်ချိန် – တနင်္လာ မှ စနေနေ့",
+        phone: "+959 4310 3121, +959 257 498 009",
         highlight: false,
     },
 ];
 
-const FOOTER_COLUMNS: FooterColumn[] = [
-    { title: "Shop", links: ["Mooncakes", "Htoomount", "Gift Sets", "New Arrivals", "Seasonal Specials"] },
-    { title: "Company", links: ["About MMC", "Our Heritage", "Factory Tour", "Wholesale", "Careers"] },
-    { title: "Support", links: ["Contact Us", "Delivery Info", "Returns Policy", "FAQ", "Track Order"] },
+const FOOTER_COLUMNS = [
+    {
+        title: "Shop",
+        links: [
+            { name: "Mooncakes", id: "products" },
+            { name: "Htoomount", id: "products" },
+            { name: "Gift Sets", id: "products" }
+        ]
+    },
+    {
+        title: "Company",
+        links: [
+            { name: "About MMC", id: "about" },
+            { name: "Our Heritage", id: "heritage" },
+            { name: "Store Locations", id: "store" }
+        ]
+    },
+    {
+        title: "Support",
+        links: [
+            { name: "Contact Us", id: "footer" },
+            { name: "Delivery Info", id: "store" }
+        ]
+    },
 ];
+
+const SOCIAL_LINKS = {
+    facebook: "https://www.facebook.com/mmcfood", // Replace with your actual FB page slug
+    messenger: "https://www.facebook.com/mmcfood",             // Replace with your actual FB page slug
+    viber: "viber://chat?number=%2B95943103121",   // International format: +959...
+};
 
 const BADGE_COLORS: Record<string, string> = {
     New: "#2D6A4F",
@@ -335,10 +412,10 @@ function CartDrawer({ cart, open, onClose, onRemove, onQty }: CartDrawerProps) {
                             background: "linear-gradient(135deg, #C4501A, #8B1A1A)", color: "#fff",
                             fontWeight: 700, fontSize: 16, cursor: "pointer", letterSpacing: "0.5px", fontFamily: "inherit",
                         }}>
-                            Checkout →
+                            📞  → 959 4310 3121
                         </button>
                         <div style={{ textAlign: "center", marginTop: 10, fontSize: 12, color: "#c0a080" }}>
-                            Free delivery in Mandalay · Orders over 10,000 Ks
+                            မန္တလေးမြို့တွင်း မှာယူမှု ၃၀,၀၀၀ ကျပ်နှင့်အထက်ကို ပို့ခအခမဲ့ (Free Delivery) ဖြင့် ဝန်ဆောင်မှုပေးနေပါသည်။
                         </div>
                     </div>
                 )}
@@ -545,9 +622,9 @@ export default function MMCShopProfile() {
     ];
 
     const filterTabs: [FilterCategory, string][] = [
-        ["all", "All Products"],
-        ["mooncake", "Mooncakes 🥮"],
-        ["htoomount", "Htoomount 🍡"],
+        ["all", "လက်ရာမွန်များ"],
+        ["mooncake", "လမုန့် 🥮"],
+        ["htoomount", "ထိုးမုန့် 🍡"],
         ["gift", "Gift Sets 🎁"],
     ];
 
@@ -616,12 +693,7 @@ export default function MMCShopProfile() {
 
                     {/* Actions */}
                     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                        <button style={{
-                            padding: "8px 16px", borderRadius: 20, border: "1.5px solid rgba(196,80,26,0.25)",
-                            background: "transparent", color: "#C4501A", fontWeight: 600, fontSize: 13, cursor: "pointer", fontFamily: "inherit",
-                        }}>
-                            Sign In
-                        </button>
+
                         <motion.button
                             whileTap={{ scale: 0.93 }}
                             onClick={() => setCartOpen(true)}
@@ -719,34 +791,34 @@ export default function MMCShopProfile() {
                     <motion.div variants={stagger} initial="hidden" animate="visible">
                         <motion.div variants={fadeUp} transition={{ duration: 0.7, delay: 0.1 }}>
                             <span style={{ display: "inline-block", padding: "6px 18px", borderRadius: 20, border: "1px solid rgba(255,255,255,0.3)", color: "rgba(255,255,255,0.8)", fontSize: 12, letterSpacing: "2px", textTransform: "uppercase", marginBottom: 28, backdropFilter: "blur(10px)", background: "rgba(255,255,255,0.05)" }}>
-                                🏮 Since 1998 · Mandalay, Myanmar
+                                🏮 Since 2005 · Mandalay, Myanmar
                             </span>
                         </motion.div>
 
                         <motion.h1 variants={fadeUp} transition={{ duration: 0.7, delay: 0.25 }} style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(42px, 7vw, 88px)", fontWeight: 800, color: "#fff", lineHeight: 1.1, marginBottom: 12 }}>
-                            Myint Myint<br />Cho <em style={{ color: "#D4A017" }}>Factory</em>
+                            Myint Myint<br />Cho <em style={{ color: "#D4A017" }}>Mandalay</em>
                         </motion.h1>
 
                         <motion.div variants={fadeUp} transition={{ duration: 0.7, delay: 0.3 }} style={{ fontFamily: "'Noto Serif Myanmar', serif", fontSize: "clamp(18px, 3vw, 28px)", color: "rgba(255,255,255,0.6)", marginBottom: 32 }}>
-                            မြင့်မြင့်ချို ထူးမောင့်နှင့် လမုန့်စက်ရုံ
+                            မြင့်မြင့်ချို ထိုးမုန့်၊ လမုန့်စက်ရုံ
                         </motion.div>
 
                         <motion.p variants={fadeUp} transition={{ duration: 0.7, delay: 0.4 }} style={{ fontSize: "clamp(15px, 2vw, 18px)", color: "rgba(255,255,255,0.75)", maxWidth: 520, lineHeight: 1.8, marginBottom: 44 }}>
-                            Mandalay's most beloved confectionery house — crafting authentic <em>Htoomount</em> and traditional <em>Mooncakes</em> with heritage recipes and premium local ingredients.
+                            မန္တလေးသားတို့ အစဉ်တစိုက် အားပေးလာကြတဲ့ - မြင့်မြင့်ချို (MMC) ရိုးရာမုန့်လုပ်ငန်း။ အဆင့်မြင့် ပြည်တွင်းဖြစ် ပါဝင်ပစ္စည်းများနဲ့ မိသားစုမျိုးဆက်သစ် လက်ရာစစ်စစ် ထိုးမုန့်နဲ့ လမုန့်များကို စနစ်တကျ ဖန်တီးထုတ်လုပ်ပေးနေပါသည်။
                         </motion.p>
 
                         <motion.div variants={fadeUp} transition={{ duration: 0.7, delay: 0.5 }} style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
                             <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }} onClick={() => scrollTo("products")} style={{ padding: "16px 32px", borderRadius: 14, border: "none", background: "#D4A017", color: "#3D1C02", fontWeight: 700, fontSize: 16, cursor: "pointer", fontFamily: "inherit", boxShadow: "0 8px 30px rgba(212,160,23,0.4)", display: "flex", alignItems: "center", gap: 8 }}>
-                                Shop Now 🛍️
+                                အခုပဲ ဝယ်ယူမယ် 🛍️
                             </motion.button>
                             <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }} onClick={() => scrollTo("about")} style={{ padding: "16px 32px", borderRadius: 14, border: "1.5px solid rgba(255,255,255,0.3)", background: "rgba(255,255,255,0.08)", color: "#fff", fontWeight: 600, fontSize: 16, cursor: "pointer", fontFamily: "inherit", backdropFilter: "blur(10px)", display: "flex", alignItems: "center", gap: 8 }}>
-                                Our Story <ArrowRight size={18} />
+                                ကျွန်ုပ်တို့အကြောင်း <ArrowRight size={18} />
                             </motion.button>
                         </motion.div>
 
                         {/* Stats */}
                         <motion.div variants={fadeUp} transition={{ duration: 0.7, delay: 0.65 }} style={{ display: "flex", gap: 40, marginTop: 64, flexWrap: "wrap" }}>
-                            {([["25+", "Years of Craft"], ["50K+", "Happy Customers"], ["30+", "Product Varieties"], ["4.9★", "Average Rating"]] as [string, string][]).map(([n, l]) => (
+                            {([["25+", "မြန်​မာ့လက်​မှုပညာနှစ်​"], ["50K+", "Happy Customers"], ["30+", "ထူးမုန့်နှင့် လမုန့် အမျိုးအစား ၃၀ ကျော်"]] as [string, string][]).map(([n, l]) => (
                                 <div key={l}>
                                     <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 32, fontWeight: 800, color: "#D4A017" }}>{n}</div>
                                     <div style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", marginTop: 2 }}>{l}</div>
@@ -771,7 +843,7 @@ export default function MMCShopProfile() {
                                 🏭
                             </div>
                             <div style={{ position: "absolute", bottom: -20, right: -20, background: "#fff", borderRadius: 20, padding: "16px 20px", boxShadow: "0 10px 40px rgba(0,0,0,0.12)", border: "1px solid #f0e6d3" }}>
-                                <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 28, fontWeight: 800, color: "#C4501A" }}>1998</div>
+                                <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 28, fontWeight: 800, color: "#C4501A" }}>2005</div>
                                 <div style={{ fontSize: 12, color: "#a08060" }}>Founded in Mandalay</div>
                             </div>
                         </div>
@@ -779,15 +851,18 @@ export default function MMCShopProfile() {
                     <AnimSection delay={0.2}>
                         <span style={{ display: "inline-block", padding: "5px 16px", borderRadius: 20, background: "rgba(196,80,26,0.08)", color: "#C4501A", fontSize: 12, fontWeight: 600, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: 20 }}>About Us</span>
                         <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(30px, 4vw, 44px)", fontWeight: 800, color: "#3D1C02", lineHeight: 1.2, marginBottom: 20 }}>
-                            A Family Legacy<br /><em style={{ color: "#C4501A" }}>Born in Mandalay</em>
+                            မိသားစုအစဉ်အလာ<br /><em style={{ color: "#C4501A" }}>မန္တလေးမှာ မွေးဖွားခဲ့သော အရသာ</em>
                         </h2>
                         <p style={{ fontSize: 16, color: "#5a3d28", lineHeight: 1.8, marginBottom: 16 }}>
-                            Myint Myint Cho — locally known as <strong>MMC</strong> — began as a small family kitchen in Mandalay in 1998. Founded by Daw Myint Myint Cho with a single <em>Htoomount</em> recipe inherited from her grandmother, the factory has grown into one of Mandalay's most celebrated confectionery brands.
+                            {/* Myint Myint Cho — locally known as <strong>MMC</strong> — began as a small family kitchen in Mandalay in 1998. Founded by Daw Myint Myint Cho with a single <em>Htoomount</em> recipe inherited from her grandmother, the factory has grown into one of Mandalay's most celebrated confectionery brands. */}
+                            ၂၀၀၅ ခုနှစ်က မန္တလေးမြို့ရဲ့ အိမ်တွင်းမီးဖိုချောင်လေးတစ်ခုကနေ စတင်ခဲ့တဲ့ <strong>"မြင့်မြင့်ချို (MMC)</strong>" ဟာ အခုဆိုရင် မန္တလေးရဲ့ နာမည်အကြီးဆုံး မုန့်လုပ်ငန်းတစ်ခု ဖြစ်နေပါပြီ။
                         </p>
                         <p style={{ fontSize: 16, color: "#5a3d28", lineHeight: 1.8, marginBottom: 28 }}>
-                            Today, we produce over 30 varieties of traditional Burmese sweets, mooncakes, and seasonal treats — all crafted by hand using locally sourced palm sugar, glutinous rice, and Mandalay's finest sesame.
+                            ယနေ့မှာတော့ မြန်မာရိုးရာမုန့်များ၊ လမုန့်များနှင့် ရာသီအလိုက် မုန့်မျိုးစုံ အမျိုးအစား ၃၀ ကျော် ကို ထုတ်လုပ်လျက်ရှိပြီး
+                            ဒေသထွက် ထန်းညှစ်၊ ကောက်ညှင်းနှင့် မန္တလေးထွက် သံပရာဆီစေ့များ ကို စနစ်တကျ လက်မှုပညာနဲ့ ထုတ်လုပ်ပေးနေပါတယ်။
+                            {/* Today, we produce over 30 varieties of traditional Burmese sweets, mooncakes, and seasonal treats — all crafted by hand using locally sourced palm sugar, glutinous rice, and Mandalay's finest sesame. */}
                         </p>
-                        {([["🌾", "100% Local Ingredients"], ["👐", "Handcrafted Daily"], ["📦", "Nationwide Delivery"], ["🏆", "Award-Winning Recipes"]] as [string, string][]).map(([icon, text]) => (
+                        {([["🌾", "ပြည်တွင်းဖြစ် ၁၀၀% စစ်စစ်"], ["👐", "နေ့စဉ် လတ်လတ်ဆတ်ဆတ် လက်မှုနည်းဖြင့် ထုတ်လုပ်သည်"], ["📦", "မြန်မာပြည်အနှံ့ ပို့ဆောင်ပေးသည်"], ["🏆", "ဆုရ ရိုးရာလက်ရာမွန်များ"]] as [string, string][]).map(([icon, text]) => (
                             <div key={text} style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
                                 <span style={{ fontSize: 20 }}>{icon}</span>
                                 <span style={{ fontSize: 15, fontWeight: 500, color: "#4a2c12" }}>{text}</span>
@@ -803,8 +878,9 @@ export default function MMCShopProfile() {
                     <AnimSection>
                         <div style={{ textAlign: "center", marginBottom: 48 }}>
                             <span style={{ display: "inline-block", padding: "5px 16px", borderRadius: 20, background: "rgba(196,80,26,0.08)", color: "#C4501A", fontSize: 12, fontWeight: 600, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: 16 }}>Our Products</span>
-                            <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(30px, 4vw, 48px)", fontWeight: 800, color: "#3D1C02", marginBottom: 14 }}>Crafted with Love & Tradition</h2>
-                            <p style={{ fontSize: 16, color: "#7a5a3a", maxWidth: 560, margin: "0 auto" }}>Every item is made fresh daily, using recipes perfected over a quarter century in the heart of Mandalay.</p>
+                            <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(30px, 4vw, 48px)", fontWeight: 800, color: "#3D1C02", marginBottom: 14 }}>မေတ္တာနှင့် ရိုးရာကို အရင်းတည်ကာ ဖန်တီးသည်</h2>
+                            <p style={{ fontSize: 16, color: "#7a5a3a", maxWidth: 560, margin: "0 auto" }}>မုန့်တိုင်းကို နေ့စဉ် လတ်ဆတ်စွာ ပြုလုပ်ထားပြီး
+                                မန္တလေးမြို့ရဲ့ နှလုံးသားထဲမှာ ၂၅ နှစ်ကျော် အတွေ့အကြုံနဲ့ ပြုပြင်မွမ်းမံထားတဲ့ နည်းစနစ်ကောင်းများကို အသုံးပြုထားပါသည်။</p>
                         </div>
                     </AnimSection>
 
@@ -865,20 +941,20 @@ export default function MMCShopProfile() {
                         <div style={{ textAlign: "center", marginBottom: 64 }}>
                             <span style={{ display: "inline-block", padding: "5px 16px", borderRadius: 20, background: "rgba(212,160,23,0.2)", color: "#D4A017", fontSize: 12, fontWeight: 600, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: 16 }}>Heritage</span>
                             <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(30px, 4vw, 48px)", fontWeight: 800, color: "#fff", marginBottom: 14 }}>
-                                The Soul of <em style={{ color: "#D4A017" }}>Mandalay</em>
+                                <em style={{ color: "#D4A017" }}>မန္တလေး</em>၏ အရသာနှင့် ဝိညာဉ်
                             </h2>
                             <p style={{ fontSize: 16, color: "rgba(255,255,255,0.65)", maxWidth: 600, margin: "0 auto" }}>
-                                Our confections are deeply rooted in the cultural tapestry of Mandalay — where tradition, craftsmanship, and community intertwine.
+                                ကျွန်ုပ်တို့၏ မုန့်များသည် မန္တလေးမြို့ရဲ့ ယဉ်ကျေးမှု၊ လက်မှုပညာနှင့် လူမှုအသိုင်းအဝိုင်း တို့နဲ့ နက်ရှိုင်းစွာ ဆက်နွယ်နေထားပါတယ်။
                             </p>
                         </div>
                     </AnimSection>
 
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 24 }}>
                         {([
-                            { icon: "🏯", title: "Royal City Roots", desc: "Mandalay — Myanmar's last royal capital — has a centuries-old tradition of handcrafted sweets. MMC carries this royal confectionery legacy forward." },
-                            { icon: "🌾", title: "Irrawaddy Ingredients", desc: "Our palm sugar comes from the banks of the Irrawaddy. Our glutinous rice from the Sagaing region. Every ingredient tells the story of the land." },
-                            { icon: "🎋", title: "Festival Culture", desc: "Htoomount and mooncakes are central to Burmese festivals — Thingyan, Thadingyut, and beyond. MMC is the preferred brand for celebrations." },
-                            { icon: "👨‍👩‍👧", title: "Three Generations", desc: "The original recipes were passed from grandmother to mother to daughter. Today, Daw Myint Myint Cho's children continue the family craft." },
+                            { icon: "🏯", title: "ရတနာပုံရဲ့ အမွေအနှစ်", desc: "မြန်မာ့နောက်ဆုံး မင်းနေပြည်တော်ဖြစ်တဲ့ မန္တလေးမြို့ဟာ လက်မှုမုန့်လုပ်ငန်း အစဉ်အလာ ကြီးမားပါတယ်။ MMC ဟာ ဒီလို မြင့်မြတ်တဲ့ မုန့်လုပ်ငန်း အစဉ်အလာကို ဆက်လက် ထိန်းသိမ်းသွားမှာပါ။" },
+                            { icon: "🌾", title: "ဧရာဝတီမြစ်ကမ်းမှ ပါဝင်ပစ္စည်းများ", desc: "ကျွန်ုပ်တို့အသုံးပြုတဲ့ ထန်းလျက်တွေက ဧရာဝတီမြစ်ကမ်းဘေးက ထွက်ရှိပြီး၊ ကောက်ညှင်းကိုတော့ စစ်ကိုင်းတိုင်းဘက်ကနေ မှာယူပါတယ်။ ပါဝင်ပစ္စည်းတိုင်းက မိခင်မြေရဲ့ အကြောင်းအရာတွေကို ဖော်ပြနေပါတယ်။" },
+                            { icon: "🎋", title: "ပွဲတော်ယဉ်ကျေးမှု", desc: "သင်္ကြန်၊ သီတင်းကျွတ်နဲ့ တခြားသော မြန်မာ့ပွဲတော်တိုင်းမှာ ထိုးမုန့်နဲ့ လမုန့်တွေက မရှိမဖြစ်ပါ။ ပွဲလမ်းသဘင်တိုင်းအတွက် MMC ကို ယုံကြည်စွာ ရွေးချယ်လေ့ရှိကြပါတယ်။" },
+                            // { icon: "👨‍👩‍👧", title: "Three Generations", desc: "The original recipes were passed from grandmother to mother to daughter. Today, Daw Myint Myint Cho's children continue the family craft." },
                         ] as { icon: string; title: string; desc: string }[]).map((item, i) => (
                             <AnimSection key={item.title} delay={i * 0.1}>
                                 <motion.div
@@ -896,8 +972,8 @@ export default function MMCShopProfile() {
                     {/* Popular products spotlight */}
                     <AnimSection delay={0.2}>
                         <div style={{ marginTop: 64, padding: "40px", borderRadius: 24, background: "rgba(212,160,23,0.1)", border: "1px solid rgba(212,160,23,0.2)" }}>
-                            <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 26, fontWeight: 700, color: "#D4A017", marginBottom: 8 }}>⭐ Our Most Beloved Creations</h3>
-                            <p style={{ color: "rgba(255,255,255,0.6)", marginBottom: 28, fontSize: 14 }}>The products that define MMC's legacy across Mandalay</p>
+                            <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 26, fontWeight: 700, color: "#D4A017", marginBottom: 8 }}>⭐ လူကြိုက်အများဆုံး လက်ရာမွန်များ</h3>
+                            <p style={{ color: "rgba(255,255,255,0.6)", marginBottom: 28, fontSize: 14 }}>မန္တလေးတစ်ခွင်မှာ MMC လို့ နာမည်ကျော်စေတဲ့ ထုတ်ကုန်များ</p>
                             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16 }}>
                                 {([
                                     { emoji: "☕", name: "Coffee Mooncake", reason: "A daring fusion of Burmese tradition and modern coffee culture" },
@@ -922,8 +998,9 @@ export default function MMCShopProfile() {
                     <AnimSection>
                         <div style={{ textAlign: "center", marginBottom: 60 }}>
                             <span style={{ display: "inline-block", padding: "5px 16px", borderRadius: 20, background: "rgba(196,80,26,0.08)", color: "#C4501A", fontSize: 12, fontWeight: 600, letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: 16 }}>Find Us</span>
-                            <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(30px, 4vw, 48px)", fontWeight: 800, color: "#3D1C02", marginBottom: 14 }}>Visit Our Factory & Stores</h2>
-                            <p style={{ fontSize: 16, color: "#7a5a3a", maxWidth: 500, margin: "0 auto" }}>Come taste fresh from the source, or find us at one of our locations across Mandalay.</p>
+                            <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(30px, 4vw, 48px)", fontWeight: 800, color: "#3D1C02", marginBottom: 14 }}>ကျွန်ုပ်တို့ရဲ့ စက်ရုံနဲ့ အရောင်းဆိုင်များသို့ ကြွလှမ်းခဲ့ပါ</h2>
+                            <p style={{ fontSize: 16, color: "#7a5a3a", maxWidth: 500, margin: "0 auto" }}>စက်ရုံမှ မုန့်များကို လတ်လတ်ဆတ်ဆတ် လာရောက်မြည်းစမ်းနိုင်သလို
+                                မန္တလေးမြို့အနှံ့ရှိ ကျွန်ုပ်တို့၏ ဆိုင်များတွင်လည်း ရှာဖွေဝယ်ယူနိုင်ပါသည်။</p>
                         </div>
                     </AnimSection>
 
@@ -955,7 +1032,7 @@ export default function MMCShopProfile() {
                                         color: loc.highlight ? "#fff" : "#C4501A",
                                         fontWeight: 600, fontSize: 14, cursor: "pointer", fontFamily: "inherit",
                                     }}>
-                                        {loc.type.includes("Online") ? "Order Online →" : "Get Directions →"}
+                                        {loc.type.includes("အွန်လိုင်း") ? "အွန်လိုင်းမှ မှာယူမည် →" : "လမ်းညွှန်ကြည့်မည် →"}
                                     </button>
                                 </div>
                             </AnimSection>
@@ -966,10 +1043,10 @@ export default function MMCShopProfile() {
                     <AnimSection delay={0.3}>
                         <div style={{ marginTop: 48, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 20 }}>
                             {([
-                                ["🚚", "Free Delivery", "Within Mandalay on orders 10,000+ Ks"],
-                                ["🎀", "Gift Wrapping", "Traditional Mandalay fabric wrapping available"],
-                                ["📱", "WhatsApp Orders", "Quick order via +95 9 111 2233"],
-                                ["♻️", "Eco Packaging", "All packaging is biodegradable & locally made"],
+                                ["🚚", "ပို့ခအခမဲ့ ဝန်ဆောင်မှု", "မန္တလေးမြို့အတွင်း ၃၀,၀၀၀ ကျပ် အထက် မှာယူပါက ပို့ဆောင်ခ အခမဲ့"],
+                                ["🎀", "လက်ဆောင်ထုပ်ပိုးမှု", "မန္တလေးရိုးရာ အထည်ဖြင့် လှပစွာ ထုပ်ပိုးပေးနိုင်ပါသည်"],
+                                ["📱", "Viber မှ မှာယူရန်", "Viber မှတစ်ဆင့် အမြန်ဆုံး မှာယူနိုင်ပါသည် 📞 +959 955 756 469"],
+                                ["♻️", "သဘာဝပတ်ဝန်းကျင်ကို ချစ်မြတ်နိုးခြင်း", "ထုပ်ပိုးမှုအားလုံးသည် သဘာဝပတ်ဝန်းကျင်ကို မထိခိုက်စေသော ပစ္စည်းများဖြင့်သာ ပြုလုပ်ထားပါသည်။"],
                             ] as [string, string, string][]).map(([icon, title, desc]) => (
                                 <div key={title} style={{ padding: "20px", borderRadius: 16, background: "#fdf5ea", border: "1px solid #f0e6d3", textAlign: "center" }}>
                                     <div style={{ fontSize: 30, marginBottom: 10 }}>{icon}</div>
@@ -992,9 +1069,9 @@ export default function MMCShopProfile() {
                             ))}
                         </div>
                         <div style={{ position: "relative", zIndex: 2 }}>
-                            <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(26px, 4vw, 44px)", fontWeight: 800, color: "#fff", marginBottom: 12 }}>Order Fresh Today</h2>
+                            <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(26px, 4vw, 44px)", fontWeight: 800, color: "#fff", marginBottom: 12 }}>ယနေ့ပဲ လတ်ဆတ်စွာ မှာယူနိုင်ပါသည်</h2>
                             <p style={{ fontSize: 16, color: "rgba(255,255,255,0.8)", maxWidth: 480, margin: "0 auto 32px" }}>
-                                All products made fresh every morning. Order by 12 PM for same-day delivery in Mandalay.
+                                မုန့်များအားလုံးကို နေ့စဉ် မနက်တိုင်း လတ်ဆတ်စွာ ပြုလုပ်ထားပါသည်။ မန္တလေးမြို့အတွင်း တစ်နေ့တည်း ပို့ဆောင်ပေးနိုင်ပါသည်။
                             </p>
                             <motion.button
                                 whileHover={{ scale: 1.04 }}
@@ -1002,7 +1079,7 @@ export default function MMCShopProfile() {
                                 onClick={() => scrollTo("products")}
                                 style={{ padding: "16px 36px", borderRadius: 14, border: "none", background: "#fff", color: "#C4501A", fontWeight: 800, fontSize: 17, cursor: "pointer", fontFamily: "inherit", boxShadow: "0 8px 30px rgba(0,0,0,0.2)" }}
                             >
-                                Browse All Products 🛍️
+                                မုန့်အမျိုးအစားများအားလုံး ကြည့်ရှုရန် 🛍️
                             </motion.button>
                         </div>
                     </div>
@@ -1021,30 +1098,48 @@ export default function MMCShopProfile() {
                                     <div style={{ fontSize: 10, color: "#a08060", letterSpacing: "1.5px" }}>မြင့်မြင့်ချို</div>
                                 </div>
                             </div>
-                            <p style={{ fontSize: 14, lineHeight: 1.7, color: "rgba(255,255,255,0.5)" }}>
-                                Authentic Burmese confections crafted with tradition, love, and the finest local ingredients since 1998.
+                            <p style={{ fontSize: 14, lineHeight: 1.7, color: "rgba(255,255,255,0.5)", margin: "0 0 24px" }}>
+                                ၂၀၀၅ ခုနှစ်မှစတင်၍
+                                အစဉ်အလာ၊ စိတ်စေတနာနှင့် ဒေသထွက် အကောင်းဆုံးပါဝင်ပစ္စည်းများဖြင့် ပြုလုပ်ထားသော မြန်မာရိုးရာ မုန့်များ
                             </p>
-                            <div style={{ display: "flex", gap: 10, marginTop: 20, flexWrap: "wrap" }}>
-                                {["📘 Facebook", "📸 Instagram", "💬 WhatsApp"].map((s) => (
-                                    <button key={s} style={{ padding: "7px 12px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.6)", fontSize: 12, cursor: "pointer", fontFamily: "inherit" }}>
-                                        {s}
-                                    </button>
-                                ))}
+
+
+
+                            <div style={{ display: "flex", gap: 16 }}>
+                                <a href={SOCIAL_LINKS.facebook} target="_blank" rel="noreferrer" style={{ color: "#fff" }}>
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" /></svg>
+                                </a>
+                                <a href={SOCIAL_LINKS.messenger} target="_blank" rel="noreferrer" style={{ color: "#fff" }}>
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 1 1-7.6-14c.9 0 1.8.1 2.7.4a8.5 8.5 0 0 1 5.8 9.8Z" /></svg>
+                                </a>
+                                <a href={SOCIAL_LINKS.viber} style={{ color: "#fff" }}>
+                                    {/* Custom Viber Icon or Phone Icon */}
+                                    <Phone size={22} />
+                                </a>
                             </div>
                         </div>
 
+                        {/* Dynamic Links */}
                         {FOOTER_COLUMNS.map((col) => (
                             <div key={col.title}>
-                                <h4 style={{ fontFamily: "'Playfair Display', serif", fontSize: 16, fontWeight: 700, color: "#fff", marginBottom: 18 }}>{col.title}</h4>
-                                {col.links.map((l) => (
-                                    <motion.div
-                                        key={l}
-                                        whileHover={{ color: "#D4A017", x: 4 }}
-                                        style={{ marginBottom: 10, fontSize: 14, cursor: "pointer", color: "rgba(255,255,255,0.5)" }}
-                                    >
-                                        {l}
-                                    </motion.div>
-                                ))}
+                                <h4 style={{ fontSize: 16, fontWeight: 700, marginBottom: 20, color: "#C4501A" }}>{col.title}</h4>
+                                <ul style={{ listStyle: "none" }}>
+                                    {col.links.map((link) => (
+                                        <li key={link.name} style={{ marginBottom: 12 }}>
+                                            <button
+                                                onClick={() => scrollTo(link.id)}
+                                                style={{
+                                                    background: "none", border: "none", color: "#c0a080",
+                                                    fontSize: 14, cursor: "pointer", transition: "color 0.2s"
+                                                }}
+                                                onMouseOver={(e) => (e.currentTarget.style.color = "#fff")}
+                                                onMouseOut={(e) => (e.currentTarget.style.color = "#c0a080")}
+                                            >
+                                                {link.name}
+                                            </button>
+                                        </li>
+                                    ))}
+                                </ul>
                             </div>
                         ))}
                     </div>
